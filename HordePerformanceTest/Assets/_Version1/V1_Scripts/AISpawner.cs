@@ -11,7 +11,7 @@ public class AISpawner : MonoBehaviour
 
     [Header("Spawn Area")]
     [SerializeField] Vector2 center = Vector2.zero;
-    [SerializeField] Vector2 size = new Vector2(100, 100);
+    [SerializeField] Vector2 size = new Vector2(200, 200);
 
     [ContextMenu("InstantiateAI")]
     public void InstantiateAI()
@@ -41,6 +41,12 @@ public class AISpawner : MonoBehaviour
     {
         foreach (Transform t in aiTransformParent)
             Destroy(t.gameObject);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.lightBlue;
+        Gizmos.DrawWireCube(center, new Vector3(size.x, size.y, 0));
     }
 
 }

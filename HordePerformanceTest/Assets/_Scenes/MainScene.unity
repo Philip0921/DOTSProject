@@ -404,7 +404,7 @@ MonoBehaviour:
   aiTransformParent: {fileID: 524086488}
   spawnCount: 1000
   center: {x: 0, y: 0}
-  size: {x: 100, y: 100}
+  size: {x: 200, y: 200}
 --- !u!4 &1930022766
 Transform:
   m_ObjectHideFlags: 0

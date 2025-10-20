@@ -104,9 +104,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60889301996084642b2e81c289c20fc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIMove
-  speed: 2
+  speed: 0.8
   decisionTimeCount: 0
-  decisionTime: {x: 1, y: 4}
+  decisionTime: {x: 1, y: 8}
 --- !u!58 &4703991058636483532
 CircleCollider2D:
   m_ObjectHideFlags: 0
