@@ -107,6 +107,7 @@ MonoBehaviour:
   speed: 0.8
   decisionTimeCount: 0
   decisionTime: {x: 1, y: 8}
+  mapSize: {x: 70, y: 40}
 --- !u!58 &4703991058636483532
 CircleCollider2D:
   m_ObjectHideFlags: 0

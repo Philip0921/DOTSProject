@@ -265,7 +265,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 20
+  orthographic size: 200
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -404,7 +404,7 @@ MonoBehaviour:
   aiTransformParent: {fileID: 524086488}
   spawnCount: 1000
   center: {x: 0, y: 0}
-  size: {x: 200, y: 200}
+  size: {x: 70, y: 40}
 --- !u!4 &1930022766
 Transform:
   m_ObjectHideFlags: 0

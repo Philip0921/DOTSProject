@@ -5,7 +5,7 @@ public class AIMove : MonoBehaviour
     [SerializeField] float speed = 0.2f;
     [SerializeField] float decisionTimeCount = 0f;
     [SerializeField] Vector2 decisionTime = new Vector2(1, 8);
-    [SerializeField] Vector2 mapSize = new Vector2(200f, 200f);
+    [SerializeField] Vector2 mapSize = new Vector2(70f, 40f);
 
     private Vector3[] moveDirections = new Vector3[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down, Vector3.zero, Vector3.zero };
     private int currentMoveDirection;

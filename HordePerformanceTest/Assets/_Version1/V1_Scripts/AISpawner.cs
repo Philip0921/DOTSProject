@@ -11,7 +11,7 @@ public class AISpawner : MonoBehaviour
 
     [Header("Spawn Area")]
     [SerializeField] Vector2 center = Vector2.zero;
-    [SerializeField] Vector2 size = new Vector2(200, 200);
+    [SerializeField] Vector2 size = new Vector2(70f, 40f);
 
     [ContextMenu("InstantiateAI")]
     public void InstantiateAI()
