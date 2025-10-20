@@ -1,16 +1,38 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class AIMove : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] float speed = 1f;
+    [SerializeField] float turnInterval = 1.5f;
+
+    Rigidbody2D rb;
+    private Vector2 dir;
+    private float time;
+
+    private void Awake()
     {
-        
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
-        
+        dir = Random.insideUnitCircle.normalized;
+        time = 0f;
+    }
+
+    private void Update()
+    {
+        time += Time.deltaTime;
+        if (time >= turnInterval)
+        {
+            time = 0f;
+            dir = (dir + Random.insideUnitCircle * 0.75f).normalized;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = dir * speed;
     }
 }
