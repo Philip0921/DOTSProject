@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class AIMove : MonoBehaviour
 {
-    [SerializeField] float speed = 1f;
+    [SerializeField] float speed = 2f;
     [SerializeField] float turnInterval = 1.5f;
 
     Rigidbody2D rb;
@@ -30,6 +30,18 @@ public class AIMove : MonoBehaviour
             dir = (dir + Random.insideUnitCircle * 0.75f).normalized;
         }
     }
+
+    //private void CollisionAvoidance()
+    //{
+    //    var hit = Physics2D.CircleCast(new Vector2(rb.position.x, rb.position.y), 1f, dir, 1f);
+
+    //    if (hit == true)
+    //    {
+    //        time = 0f;
+    //    }
+        
+
+    //}
 
     private void FixedUpdate()
     {
