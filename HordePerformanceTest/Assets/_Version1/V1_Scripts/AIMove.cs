@@ -1,50 +1,40 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class AIMove : MonoBehaviour
 {
-    [SerializeField] float speed = 2f;
-    [SerializeField] float turnInterval = 1.5f;
+    [SerializeField] float speed = 0.2f;
+    [SerializeField] float decisionTimeCount = 0f;
+    [SerializeField] Vector2 decisionTime = new Vector2(1, 8);
 
-    Rigidbody2D rb;
-    private Vector2 dir;
-    private float time;
+    private Vector3[] moveDirections = new Vector3[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down, Vector3.zero, Vector3.zero };
+    private int currentMoveDirection;
 
-    private void Awake()
+    private void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-    }
+        decisionTimeCount = Random.Range(decisionTime.x, decisionTime.y);
 
-    private void OnEnable()
-    {
-        dir = Random.insideUnitCircle.normalized;
-        time = 0f;
+        PickMoveDirection();
     }
 
     private void Update()
     {
-        time += Time.deltaTime;
-        if (time >= turnInterval)
+        transform.position += moveDirections[currentMoveDirection] * Time.deltaTime * speed;
+
+        if (decisionTimeCount > 0) decisionTimeCount -= Time.deltaTime;
+        else
         {
-            time = 0f;
-            dir = (dir + Random.insideUnitCircle * 0.75f).normalized;
+            // Choose a random time delay for taking a decision ( changing direction, or standing in place for a while )
+            decisionTimeCount = Random.Range(decisionTime.x, decisionTime.y);
+
+            // Choose a movement direction, or stay in place
+            PickMoveDirection();
         }
     }
 
-    //private void CollisionAvoidance()
-    //{
-    //    var hit = Physics2D.CircleCast(new Vector2(rb.position.x, rb.position.y), 1f, dir, 1f);
-
-    //    if (hit == true)
-    //    {
-    //        time = 0f;
-    //    }
-        
-
-    //}
-
-    private void FixedUpdate()
+    void PickMoveDirection()
     {
-        rb.linearVelocity = dir * speed;
+        // Choose whether to move sideways or up/down
+        currentMoveDirection = Mathf.FloorToInt(Random.Range(0, moveDirections.Length));
     }
+
 }
