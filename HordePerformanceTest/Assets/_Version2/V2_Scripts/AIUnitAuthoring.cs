@@ -10,7 +10,7 @@ public class AIUnitAuthoring : MonoBehaviour
     {
         public override void Bake(AIUnitAuthoring a)
         {
-            var e = GetEntity(TransformUsageFlags.Dynamic);
+            Entity e = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent<Velocity2D>(e);
             AddComponent(e, new Wander2D
             {
