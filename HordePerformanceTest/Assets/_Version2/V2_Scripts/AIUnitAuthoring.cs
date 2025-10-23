@@ -4,8 +4,16 @@ using Unity.Transforms;
 using Unity.Entities;
 using UnityEditor.PackageManager;
 
+public class VisualPrefabRef : IComponentData
+{
+    public GameObject Prefab;
+}
+
 public class AIUnitAuthoring : MonoBehaviour
 {
+    [Header("Visuals")]
+    public GameObject visualPrefab;
+
     [Header("Movement")]
     public float speed = 1.0f;
 
@@ -36,6 +44,12 @@ public class AIUnitAuthoring : MonoBehaviour
                 Center = a.mapCenter,
                 Size = a.mapSize
             });
+
+            if (a.visualPrefab != null)
+            {
+                // Den här länken låter DOTS skapa en separat GameObject-instans
+                AddComponentObject(e, new VisualPrefabRef { Prefab = a.visualPrefab });
+            }
         }
     }
 }

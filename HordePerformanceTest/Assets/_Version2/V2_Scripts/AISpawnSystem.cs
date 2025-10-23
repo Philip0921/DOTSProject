@@ -1,11 +1,10 @@
-using Unity.Burst;
+﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Profiling;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 [BurstCompile]
 public partial class AISpawnSystem : SystemBase
@@ -36,9 +35,9 @@ public partial class AISpawnSystem : SystemBase
             {
                 Entity prefab = prefabRef.ValueRO.Prefab;
 
-                DecisionData baseDD = EntityManager.HasComponent<DecisionData>(prefab)
-                    ? EntityManager.GetComponentData<DecisionData>(prefab)
-                    : new DecisionData { Range = new float2(1f, 8f), Remaining = 0f };
+                //DecisionData baseDD = EntityManager.HasComponent<DecisionData>(prefab)
+                //    ? EntityManager.GetComponentData<DecisionData>(prefab)
+                //    : new DecisionData { Range = new float2(1f, 8f), Remaining = 0f };
 
                 int n = cfg.ValueRO.SpawnCount;
 
@@ -74,12 +73,12 @@ public partial class AISpawnSystem : SystemBase
                         case 3: dir = new float2(0, -1); break;
                         default: dir = float2.zero; break;
                     }
-
                     ecb.SetComponent(e, new MoveDir { Value = dir });
 
-
+                    var baseDD = EntityManager.GetComponentData<DecisionData>(prefab);
                     float rem = math.lerp(baseDD.Range.x, baseDD.Range.y, rng.NextFloat());
                     ecb.SetComponent(e, new DecisionData { Remaining = rem, Range = baseDD.Range });
+
                 }
 
                 ecb.RemoveComponent<AISpawnState>(entity);
@@ -89,3 +88,4 @@ public partial class AISpawnSystem : SystemBase
         }
     }
 }
+
