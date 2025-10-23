@@ -32,8 +32,8 @@ public partial struct AIMoveSystem : ISystem
                 transform.Position.xy += delta;
 
                 // Utanför bounds?
-                float halfX = bounds.ValueRO.Size.x * dt;
-                float halfY = bounds.ValueRO.Size.y * dt;
+                float halfX = bounds.ValueRO.Size.x * 0.5f;
+                float halfY = bounds.ValueRO.Size.y * 0.5f;
 
                 if (transform.Position.x >= halfX || transform.Position.x <= -halfX ||
                     transform.Position.y >= halfY || transform.Position.y <= -halfY)

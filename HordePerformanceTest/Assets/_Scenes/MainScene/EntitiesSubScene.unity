@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AISpawnAuthoring
   aiPrefab: {fileID: 8705653661319719908, guid: c0d579f15dfca7b41af17a13ff46ef29, type: 3}
-  spawnCount: 1000
+  spawnCount: 100
   center: {x: 0, y: 0}
   size: {x: 70, y: 40}
 --- !u!1660057539 &9223372036854775807
