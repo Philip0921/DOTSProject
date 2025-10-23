@@ -172,7 +172,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0f1befe05035084980bb0306bef38a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIUnitAuthoring
-  speed: 0.2
-  decisionTime: {x: 1, y: 8}
-  mapSize: {x: 70, y: 40}
-  randomizeOnBake: 1
+  speed: 2
+  decisionRange:
+    x: 1
+    y: 5
+  mapCenter:
+    x: 0
+    y: 0
+  mapSize:
+    x: 70
+    y: 40

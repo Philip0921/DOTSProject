@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.VisualScripting;
 using Unity.Profiling;
+using Unity.VisualScripting.Dependencies.Sqlite;
 
 [BurstCompile]
 public partial struct AIMoveSystem : ISystem
@@ -21,32 +22,39 @@ public partial struct AIMoveSystem : ISystem
             float dt = SystemAPI.Time.DeltaTime;
             int processed = 0;
 
+
             foreach ((RefRW<LocalTransform> lt, RefRW<Speed> speed, RefRW<MoveDir> dir, RefRW<MapBounds> bounds, RefRW<RNG> rngRef) in
             SystemAPI.Query<RefRW<LocalTransform>, RefRW<Speed>, RefRW<MoveDir>, RefRW<MapBounds>, RefRW<RNG>>())
             {
                 processed++;
                 var transform = lt.ValueRW;
 
+                float2 center = bounds.ValueRO.Center;
+                float2 size = bounds.ValueRO.Size;
+
                 // Rörelse i XY-plan
-                float2 delta = dir.ValueRO.Value * speed.ValueRO.Value * dt;
-                transform.Position.xy += delta;
+                // Rörelse: pos += dir * speed * dt
+                float3 pos = transform.Position;
+                float2 d = dir.ValueRO.Value;
+                float v = speed.ValueRO.Value;
+
+                pos.x += d.x * v * dt;
+                pos.y += d.y * v * dt;
+
 
                 // Utanför bounds?
                 float halfX = bounds.ValueRO.Size.x * 0.5f;
                 float halfY = bounds.ValueRO.Size.y * 0.5f;
 
-                if (transform.Position.x >= halfX || transform.Position.x <= -halfX ||
-                    transform.Position.y >= halfY || transform.Position.y <= -halfY)
-                {
-                    // Teleportera till slumpad punkt inom bounds.
-                    var rng = rngRef.ValueRW.Value;
-                    float x = rng.NextFloat(-halfX, halfX);
-                    float y = rng.NextFloat(-halfY, halfY);
-                    transform.Position = new float3(x, y, 0f);
-                    rngRef.ValueRW.Value = rng; // Spara rng-state
-                }
+                float minX = center.x - halfX;
+                float maxX = center.x + halfX;
+                float minY = center.y - halfY;
+                float maxY = center.y + halfY;
 
-                lt.ValueRW = transform;
+                pos.x = math.clamp(pos.x, minX, maxX);
+                pos.y = math.clamp(pos.y, minY, maxY);
+
+                lt.ValueRW.Position = pos;
             }
 
             kMoved.Value = processed;

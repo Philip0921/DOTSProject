@@ -21,6 +21,7 @@ public struct MoveDir : IComponentData
 public struct MapBounds : IComponentData
 {
     public float2 Size; // (Width, Height)
+    public float2 Center; 
 }
 public struct RNG : IComponentData
 {
