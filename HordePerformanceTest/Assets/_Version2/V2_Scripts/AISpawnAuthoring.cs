@@ -11,10 +11,6 @@ public class AISpawnAuthoring : MonoBehaviour
     public Vector2 center = Vector2.zero;
     public Vector2 size = new Vector2(70f, 40f);
 
-    [Header("Movement Variables")]
-    public float speed = 2f;
-    public float turnInterval = 1.5f;
-
     class Baker : Baker<AISpawnAuthoring>
     {
         public override void Bake(AISpawnAuthoring a)
@@ -26,14 +22,12 @@ public class AISpawnAuthoring : MonoBehaviour
                 SpawnCount = a.spawnCount,
                 Center = a.center,
                 Size = a.size,
-                Speed = a.speed,    
-                TurnInterval = a.turnInterval,
             });
-
-            AddComponent(e, new AISpawnState());
-
-            Entity prefab = GetEntity(a.aiPrefab, TransformUsageFlags.Dynamic);
-            AddComponent(e, new PrefabRef { Prefab = prefab });
+            AddComponent<AISpawnState>(e);
+            AddComponent(e, new PrefabRef
+            {
+                Prefab = GetEntity(a.aiPrefab, TransformUsageFlags.Dynamic)
+            });
         }
     }
 }
