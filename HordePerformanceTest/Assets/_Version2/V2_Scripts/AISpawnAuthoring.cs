@@ -30,4 +30,10 @@ public class AISpawnAuthoring : MonoBehaviour
             });
         }
     }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.lightBlue;
+        Gizmos.DrawWireCube(center, new Vector3(size.x, size.y, 0));
+    }
 }

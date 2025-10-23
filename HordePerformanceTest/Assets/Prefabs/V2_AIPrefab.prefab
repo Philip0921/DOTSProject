@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5497800148985998069}
   - component: {fileID: 2850348777454197749}
-  - component: {fileID: 6073391672599153158}
+  - component: {fileID: 5397698008547995318}
+  - component: {fileID: -3025721605363625752}
   m_Layer: 0
   m_Name: V2_AIPrefab
   m_TagString: AI
@@ -91,7 +92,43 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6073391672599153158
+--- !u!58 &5397698008547995318
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2223909243461409225}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5
+--- !u!114 &-3025721605363625752
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -103,5 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0f1befe05035084980bb0306bef38a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIUnitAuthoring
-  initialSpeed: 2
-  turnInterval: 1.5
+  speed: 0.2
+  decisionTime: {x: 1, y: 8}
+  mapSize: {x: 70, y: 40}
+  randomizeOnBake: 1
