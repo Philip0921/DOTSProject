@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5497800148985998069}
   - component: {fileID: 2850348777454197749}
+  - component: {fileID: 6073391672599153158}
   m_Layer: 0
   m_Name: V2_AIPrefab
-  m_TagString: Untagged
+  m_TagString: AI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -90,3 +91,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6073391672599153158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2223909243461409225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f1befe05035084980bb0306bef38a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIUnitAuthoring
+  initialSpeed: 2
+  turnInterval: 1.5
