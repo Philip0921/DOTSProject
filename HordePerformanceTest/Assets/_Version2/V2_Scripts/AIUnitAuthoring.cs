@@ -4,11 +4,6 @@ using Unity.Transforms;
 using Unity.Entities;
 using UnityEditor.PackageManager;
 
-public class VisualPrefabRef : IComponentData
-{
-    public GameObject Prefab;
-}
-
 public class AIUnitAuthoring : MonoBehaviour
 {
     [Header("Visuals")]
