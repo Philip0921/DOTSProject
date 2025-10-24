@@ -35,10 +35,6 @@ public partial class AISpawnSystem : SystemBase
             {
                 Entity prefab = prefabRef.ValueRO.Prefab;
 
-                //DecisionData baseDD = EntityManager.HasComponent<DecisionData>(prefab)
-                //    ? EntityManager.GetComponentData<DecisionData>(prefab)
-                //    : new DecisionData { Range = new float2(1f, 8f), Remaining = 0f };
-
                 int n = cfg.ValueRO.SpawnCount;
 
                 using var spawned = new NativeArray<Entity>(n, Allocator.Temp);
@@ -74,13 +70,12 @@ public partial class AISpawnSystem : SystemBase
                         default: dir = float2.zero; break;
                     }
                     ecb.SetComponent(e, new MoveDir { Value = dir });
-
+   
                     var baseDD = EntityManager.GetComponentData<DecisionData>(prefab);
                     float rem = math.lerp(baseDD.Range.x, baseDD.Range.y, rng.NextFloat());
                     ecb.SetComponent(e, new DecisionData { Remaining = rem, Range = baseDD.Range });
 
                 }
-
                 ecb.RemoveComponent<AISpawnState>(entity);
             }
 
