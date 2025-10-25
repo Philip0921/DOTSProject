@@ -603,15 +603,10 @@ MonoBehaviour:
   aiRoot: {fileID: 524086488}
   initialBatchSize: 100
   batchStepSize: 100
-  stepInterval: 2
+  stepInterval: 5
   currentTargetTotal: 0
   liveAgentCount: 0
   runTimeSeconds: 0
-  lastFrameMS: 0
-  lastDecisionMS: 0
-  lastMoveMS: 0
-  lastSpawnMS: 0
-  ok60: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
