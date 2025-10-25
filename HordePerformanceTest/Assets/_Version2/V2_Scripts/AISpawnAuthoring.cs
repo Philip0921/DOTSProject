@@ -1,11 +1,11 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 
 public class AISpawnAuthoring : MonoBehaviour
 {
     [Header("Prefabs & Count")]
     public GameObject aiPrefab;
-    public int spawnCount = 100;
 
     [Header("Spawn Area")]
     public Vector2 center = Vector2.zero;
@@ -17,11 +17,22 @@ public class AISpawnAuthoring : MonoBehaviour
         {
             Entity e = GetEntity(TransformUsageFlags.None);
 
+            float2 prefabDecisionRange = float2.zero;
+            if (a.aiPrefab != null)
+            {
+                var aiUnitAuthoring = a.aiPrefab.GetComponent<AIUnitAuthoring>();
+                if (aiUnitAuthoring != null)
+                {
+                    prefabDecisionRange = aiUnitAuthoring.decisionRange;
+                }
+            }
+
             AddComponent(e, new AISpawnConfig
             {
-                SpawnCount = a.spawnCount,
+                SpawnCount = 0,
                 Center = a.center,
                 Size = a.size,
+                DecisionRange = prefabDecisionRange
             });
             AddComponent<AISpawnState>(e);
             AddComponent(e, new PrefabRef

@@ -10,6 +10,8 @@ using UnityEngine.Profiling;
 [BurstCompile]
 public partial class AISpawnSystem : SystemBase
 {
+    // Static marker + manual stopwatch
+    static readonly ProfilerMarker SpawnMarker = new ProfilerMarker("AISpawnSystem_Total");
     private EndSimulationEntityCommandBufferSystem _endSimEcb;
 
     [BurstCompile]
@@ -22,26 +24,12 @@ public partial class AISpawnSystem : SystemBase
     [BurstCompile]
     protected override void OnUpdate()
     {
+        // Start timestamp (CPU now)
+        double start = UnityEngine.Time.realtimeSinceStartupAsDouble;
 
         // ECB ParallelWriter we can use in the job
         var ecbParallel = _endSimEcb.CreateCommandBuffer().AsParallelWriter();
 
-        Entity firstPrefab = Entity.Null;
-        DecisionData baseDD = default;
-
-        {
-            // Just read first available prefab+DecisionData for seeding
-            foreach (var (prefabRefRO, entity) in
-                     SystemAPI.Query<RefRO<PrefabRef>>().WithEntityAccess())
-            {
-                firstPrefab = prefabRefRO.ValueRO.Prefab;
-                baseDD = EntityManager.GetComponentData<DecisionData>(firstPrefab);
-                break;
-            }
-        }
-
-        // Vi vill ha en "seed per frame" men UnityEngine.Random kan inte användas i Burst,
-        // så vi genererar ett seed här på main thread och skickar in.
         uint frameSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
 
         var job = new AISpawnJob
@@ -50,13 +38,21 @@ public partial class AISpawnSystem : SystemBase
             FrameSeed = frameSeed
         };
 
-        // Schedule the job over all spawner entities
-        Profiler.BeginSample("SampleSpawn");
-        Dependency = job.ScheduleParallel(Dependency);
-        Profiler.EndSample();
+        // Schedule + complete for measurement
+        SpawnMarker.Begin();
+        var handle = job.ScheduleParallel(Dependency);
+        Dependency = handle;
+        Dependency.Complete();
 
         // Tell ECB system to play back after this job finishes
         _endSimEcb.AddJobHandleForProducer(Dependency);
+
+        SpawnMarker.End();
+
+        double end = UnityEngine.Time.realtimeSinceStartupAsDouble;
+        double elapsedMs = (end - start) * 1000.0;
+
+        PerfSampler.RecordSpawnMs((float)elapsedMs);
 
     }
 
@@ -65,9 +61,8 @@ public partial class AISpawnSystem : SystemBase
     {
         public EntityCommandBuffer.ParallelWriter Ecb;
         public uint FrameSeed;
-        public DecisionData BaseDecision;
 
-        // Execute körs för varje "spawner entity" som har de här komponenterna
+        // Execute runs for each "spawner entity"
         void Execute([ChunkIndexInQuery] int sortKey,
                      Entity spawnerEntity,
                      in AISpawnConfig cfg,
@@ -79,12 +74,14 @@ public partial class AISpawnSystem : SystemBase
             float halfX = cfg.Size.x * 0.5f;
             float halfY = cfg.Size.y * 0.5f;
 
+            float2 decisionRange = cfg.DecisionRange;
+
             for (int i = 0; i < n; i++)
             {
-                // Skapa rng för den här instansen
+                // RNG Instance
                 var rng = Unity.Mathematics.Random.CreateFromIndex(FrameSeed + (uint)i);
 
-                // Instantiera
+                // Instantiate
                 Entity e = Ecb.Instantiate(sortKey, prefabRef.Prefab);
 
                 // Position
@@ -100,7 +97,7 @@ public partial class AISpawnSystem : SystemBase
                 // RNG component init
                 Ecb.SetComponent(sortKey, e, new RNG { Value = rng });
 
-                // Start dir
+                // Initial dir so they don't all stand still
                 float2 dir;
                 switch ((int)math.floor(rng.NextFloat(0, 6)))
                 {
@@ -113,12 +110,12 @@ public partial class AISpawnSystem : SystemBase
                 Ecb.SetComponent(sortKey, e, new MoveDir { Value = dir });
 
                 // Give them DecisionData with randomized Remaining based on prefab baseline
-                float rem = math.lerp(BaseDecision.Range.x, BaseDecision.Range.y, rng.NextFloat());
+                float rem = math.lerp(decisionRange.x, decisionRange.y, rng.NextFloat());
 
                 Ecb.SetComponent(sortKey, e, new DecisionData
                 {
                     Remaining = rem,
-                    Range = BaseDecision.Range
+                    Range = decisionRange
                 });
             }
 

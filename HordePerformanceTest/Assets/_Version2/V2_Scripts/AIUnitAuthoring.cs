@@ -42,7 +42,7 @@ public class AIUnitAuthoring : MonoBehaviour
 
             if (a.visualPrefab != null)
             {
-                // Den här länken låter DOTS skapa en separat GameObject-instans
+                // Create new visuals
                 AddComponentObject(e, new VisualPrefabRef { Prefab = a.visualPrefab });
             }
         }

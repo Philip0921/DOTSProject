@@ -5,30 +5,43 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Profiling;
 using UnityEngine.Profiling;
+using UnityEngine;
 
 [BurstCompile]
 public partial struct AIDecisionSystem : ISystem
 {
+    // Static marker + manual stopwatch
+    static readonly ProfilerMarker DecisionMarker = new ProfilerMarker("AIDecisionSystem_Total");
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         float dt = SystemAPI.Time.DeltaTime;
 
+        // Start timestamp (CPU now)
+        double start = Time.realtimeSinceStartupAsDouble;
 
-        // Skicka in dt till jobben via IJobEntity-scheduler
+        // Send dt to jobs - IJobEntity-scheduler
         var job = new AIDecisionJob
         {
             DeltaTime = dt
         };
 
-        Profiler.BeginSample("SampleDecision");
-        job.ScheduleParallel();
-        Profiler.EndSample();
+        // Schedule + complete for measurement
+        DecisionMarker.Begin();
+        var handle = job.ScheduleParallel(state.Dependency);
+        state.Dependency = handle;
+        state.Dependency.Complete();
+        DecisionMarker.End();
+
+        double end = Time.realtimeSinceStartupAsDouble;
+        double elapsedMs = (end - start) * 1000.0;
+
+        PerfSampler.RecordDecisionMs((float)elapsedMs);
 
     }
 
-    // IJobEntity genererar queryn åt oss baserat på parametertyperna.
+    // IJobEntity generates query based on parametertypes.
     [BurstCompile]
     public partial struct AIDecisionJob : IJobEntity
     {
@@ -43,13 +56,13 @@ public partial struct AIDecisionSystem : ISystem
 
             if (d.Remaining <= 0f)
             {
-                // Plocka ut current rng state
+                // Pick current rng state
                 var rng = rngRef.Value;
 
-                // Ny timer
+                // New timer
                 d.Remaining = rng.NextFloat(d.Range.x, d.Range.y);
 
-                // Välj ny riktning: höger, vänster, upp, ner, tom, tom
+                // Pick new direction: right, left, up, down, empty, empty
                 int pick = (int)math.floor(rng.NextFloat(0, 6));
                 float2 newDir;
                 switch (pick)
@@ -63,7 +76,7 @@ public partial struct AIDecisionSystem : ISystem
 
                 dir.Value = newDir;
 
-                // Spara tillbaka rng-state
+                // Save rng-state
                 rngRef.Value = rng;
             }
 

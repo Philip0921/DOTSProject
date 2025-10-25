@@ -6,24 +6,39 @@ using Unity.VisualScripting;
 using Unity.Profiling;
 using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine.Profiling;
+using UnityEngine;
 
 [BurstCompile]
 public partial struct AIMoveSystem : ISystem
 {
+    // Static marker + manual stopwatch
+    static readonly ProfilerMarker MoveMarker = new ProfilerMarker("AIMoveSystem_Total");
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
 
         float dt = SystemAPI.Time.DeltaTime;
 
+        // Start timestamp (CPU now)
+        double start = Time.realtimeSinceStartupAsDouble;
+
         var job = new AIMoveJob
         {
             DeltaTime = dt
         };
 
-        Profiler.BeginSample("SampleMove");
-        job.ScheduleParallel();
-        Profiler.EndSample();
+        // Schedule + complete for measurement
+        MoveMarker.Begin();
+        var handle = job.ScheduleParallel(state.Dependency);
+        state.Dependency = handle;
+        state.Dependency.Complete();
+        MoveMarker.End();
+
+        double end = Time.realtimeSinceStartupAsDouble;
+        double elapsedMs = (end - start) * 1000.0;
+
+        PerfSampler.RecordMoveMs((float)elapsedMs);
 
     }
 
@@ -38,7 +53,7 @@ public partial struct AIMoveSystem : ISystem
                      in MapBounds bounds)
         {
 
-            // Rörelse i XY-plan
+            // Movement in XY-plane
             float3 pos = lt.Position;
             float2 d = dir.Value;
             float v = speed.Value;
@@ -61,7 +76,7 @@ public partial struct AIMoveSystem : ISystem
             pos.x = math.clamp(pos.x, minX, maxX);
             pos.y = math.clamp(pos.y, minY, maxY);
 
-            // Skriv tillbaka
+            // Write back
             lt.Position = pos;
         }
     }

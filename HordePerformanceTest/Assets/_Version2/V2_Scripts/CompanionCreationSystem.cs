@@ -3,42 +3,39 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-// Lägg CompanionGO när entiteten saknar den men har VisualPrefabRef
-// Kör i Presentation så det sker efter EndSimulation ECB-playback.
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class CompanionCreationSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        // Bygg en query på entiteter som behöver en companion
+        // Build query for entites that need a companion
         var q = SystemAPI.QueryBuilder()
-            .WithAll<LocalTransform, VisualPrefabRef>()  // har prefab-ref
-            .WithNone<CompanionGO>()                     // har ännu ingen GO
+            .WithAll<LocalTransform, VisualPrefabRef>()  // Has prefab-ref
+            .WithNone<CompanionGO>()                     // Has no GO
             .Build();
 
-        // Viktigt: ta en SNAPSHOT av entiteter först!
+        // Important: take a SNAPSHOT of the entities first!
         using var entities = q.ToEntityArray(Unity.Collections.Allocator.Temp);
 
         foreach (var e in entities)
         {
-            // Läs prefab-referensen (managed) från entiteten
+            // Read prefab-reference (managed) from entity
             var vis = EntityManager.GetComponentObject<VisualPrefabRef>(e);
             if (vis?.Prefab == null) continue;
 
-            // Skapa GO
+            // Create GO
             var go = Object.Instantiate(vis.Prefab);
             go.name = $"AI_{e.Index}";
 
-            // Sätt initial position från ECS-transform
+            // Initial position from ECS-transform
             var lt = EntityManager.GetComponentData<LocalTransform>(e).Position;
             go.transform.position = new Vector3(lt.x, lt.y, lt.z);
 
-            // Lägg managed komponenten på entiteten (tillåtet här, vi itererar inte "live")
+            // Add managed component to the entity 
             EntityManager.AddComponentObject(e, new CompanionGO { Instance = go });
         }
     }
 }
 
-// Din managed komponenter:
 public class VisualPrefabRef : IComponentData { public GameObject Prefab; }
 public class CompanionGO : IComponentData { public GameObject Instance; }

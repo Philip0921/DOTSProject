@@ -16,7 +16,7 @@ public struct DecisionData : IComponentData
 }
 public struct MoveDir : IComponentData
 {
-    public float2 Value; // Riktingsvektor (0,0)
+    public float2 Value; // Direction Vector (0,0)
 }
 public struct MapBounds : IComponentData
 {
