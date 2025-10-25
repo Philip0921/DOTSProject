@@ -5,15 +5,11 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 [BurstCompile]
 public partial class AISpawnSystem : SystemBase
 {
-    static readonly ProfilerCategory kCat = ProfilerCategory.Scripts;
-    static readonly ProfilerMarker kMarker = new ProfilerMarker(kCat, "AISpawnSystem.Update");
-    static ProfilerCounterValue<int> kSpawned =
-        new ProfilerCounterValue<int>(kCat, "AI Entities Spawned (frame)", ProfilerMarkerDataUnit.Count);
-
     private EndSimulationEntityCommandBufferSystem _endSimEcb;
 
     [BurstCompile]
@@ -26,61 +22,59 @@ public partial class AISpawnSystem : SystemBase
     [BurstCompile]
     protected override void OnUpdate()
     {
-        using (kMarker.Auto())
+
+        var ecb = _endSimEcb.CreateCommandBuffer();
+
+        Profiler.BeginSample("SampleSpawn");
+
+        foreach ((RefRO<AISpawnConfig> cfg, RefRO<PrefabRef> prefabRef, Entity entity) in SystemAPI.Query<RefRO<AISpawnConfig>, RefRO<PrefabRef>>().WithEntityAccess())
         {
-            var ecb = _endSimEcb.CreateCommandBuffer();
-            int spawnedFrame = 0;
+            Entity prefab = prefabRef.ValueRO.Prefab;
 
-            foreach ((RefRO<AISpawnConfig> cfg, RefRO<PrefabRef> prefabRef, Entity entity) in SystemAPI.Query<RefRO<AISpawnConfig>, RefRO<PrefabRef>>().WithEntityAccess())
+            int n = cfg.ValueRO.SpawnCount;
+
+            using var spawned = new NativeArray<Entity>(n, Allocator.Temp);
+
+            ecb.Instantiate(prefabRef.ValueRO.Prefab, spawned);
+
+            // Slumpa startpositioner
+            uint batchSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+
+            float halfX = cfg.ValueRO.Size.x * 0.5f;
+            float halfY = cfg.ValueRO.Size.y * 0.5f;
+
+            for (int i = 0; i < n; i++)
             {
-                Entity prefab = prefabRef.ValueRO.Prefab;
+                Entity e = spawned[i];
+                var rng = Unity.Mathematics.Random.CreateFromIndex(batchSeed + (uint)i);
 
-                int n = cfg.ValueRO.SpawnCount;
+                float x = rng.NextFloat(cfg.ValueRO.Center.x - halfX, cfg.ValueRO.Center.x + halfX);
+                float y = rng.NextFloat(cfg.ValueRO.Center.y - halfY, cfg.ValueRO.Center.y + halfY);
+                ecb.SetComponent(e, LocalTransform.FromPositionRotationScale(new float3(x, y, 0f), quaternion.identity, 1f));
 
-                using var spawned = new NativeArray<Entity>(n, Allocator.Temp);
+                ecb.SetComponent(e, new RNG { Value = rng });
 
-                ecb.Instantiate(prefabRef.ValueRO.Prefab, spawned);
-                spawnedFrame += n;
-
-                // Slumpa startpositioner
-                uint batchSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
-
-                float halfX = cfg.ValueRO.Size.x * 0.5f;
-                float halfY = cfg.ValueRO.Size.y * 0.5f;
-
-                for (int i = 0; i < n; i++)
+                // Startdir (desynka start)
+                float2 dir;
+                switch ((int)math.floor(rng.NextFloat(0, 6)))
                 {
-                    Entity e = spawned[i];
-                    var rng = Unity.Mathematics.Random.CreateFromIndex(batchSeed + (uint)i);
-
-                    float x = rng.NextFloat(cfg.ValueRO.Center.x - halfX, cfg.ValueRO.Center.x + halfX);
-                    float y = rng.NextFloat(cfg.ValueRO.Center.y - halfY, cfg.ValueRO.Center.y + halfY);
-                    ecb.SetComponent(e, LocalTransform.FromPositionRotationScale(new float3(x, y, 0f), quaternion.identity, 1f));
-
-                    ecb.SetComponent(e, new RNG { Value = rng });
-
-                    // Startdir (desynka start)
-                    float2 dir;
-                    switch ((int)math.floor(rng.NextFloat(0, 6)))
-                    {
-                        case 0: dir = new float2(1, 0); break;
-                        case 1: dir = new float2(-1, 0); break;
-                        case 2: dir = new float2(0, 1); break;
-                        case 3: dir = new float2(0, -1); break;
-                        default: dir = float2.zero; break;
-                    }
-                    ecb.SetComponent(e, new MoveDir { Value = dir });
-   
-                    var baseDD = EntityManager.GetComponentData<DecisionData>(prefab);
-                    float rem = math.lerp(baseDD.Range.x, baseDD.Range.y, rng.NextFloat());
-                    ecb.SetComponent(e, new DecisionData { Remaining = rem, Range = baseDD.Range });
-
+                    case 0: dir = new float2(1, 0); break;
+                    case 1: dir = new float2(-1, 0); break;
+                    case 2: dir = new float2(0, 1); break;
+                    case 3: dir = new float2(0, -1); break;
+                    default: dir = float2.zero; break;
                 }
-                ecb.RemoveComponent<AISpawnState>(entity);
-            }
+                ecb.SetComponent(e, new MoveDir { Value = dir });
 
-            kSpawned.Value = spawnedFrame; // profiler-counter
+                var baseDD = EntityManager.GetComponentData<DecisionData>(prefab);
+                float rem = math.lerp(baseDD.Range.x, baseDD.Range.y, rng.NextFloat());
+                ecb.SetComponent(e, new DecisionData { Remaining = rem, Range = baseDD.Range });
+
+            }
+            ecb.RemoveComponent<AISpawnState>(entity);
         }
+        Profiler.EndSample();
+
     }
 }
 
