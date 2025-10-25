@@ -16,29 +16,42 @@ public partial struct AIMoveSystem : ISystem
 
         float dt = SystemAPI.Time.DeltaTime;
 
-        Profiler.BeginSample("SampleMove");
-
-        foreach ((RefRW<LocalTransform> lt, RefRW<Speed> speed, RefRW<MoveDir> dir, RefRW<MapBounds> bounds, RefRW<RNG> rngRef) in
-        SystemAPI.Query<RefRW<LocalTransform>, RefRW<Speed>, RefRW<MoveDir>, RefRW<MapBounds>, RefRW<RNG>>())
+        var job = new AIMoveJob
         {
-            var transform = lt.ValueRW;
+            DeltaTime = dt
+        };
 
-            float2 center = bounds.ValueRO.Center;
-            float2 size = bounds.ValueRO.Size;
+        Profiler.BeginSample("SampleMove");
+        job.ScheduleParallel();
+        Profiler.EndSample();
+
+    }
+
+    [BurstCompile]
+    public partial struct AIMoveJob : IJobEntity
+    {
+        public float DeltaTime;
+
+        void Execute(ref LocalTransform lt,
+                     in Speed speed,
+                     in MoveDir dir,
+                     in MapBounds bounds)
+        {
 
             // Rörelse i XY-plan
-            // Rörelse: pos += dir * speed * dt
-            float3 pos = transform.Position;
-            float2 d = dir.ValueRO.Value;
-            float v = speed.ValueRO.Value;
+            float3 pos = lt.Position;
+            float2 d = dir.Value;
+            float v = speed.Value;
 
-            pos.x += d.x * v * dt;
-            pos.y += d.y * v * dt;
+            pos.x += d.x * v * DeltaTime;
+            pos.y += d.y * v * DeltaTime;
 
+            // Bounds clamp
+            float2 center = bounds.Center;
+            float2 size = bounds.Size;
 
-            // Utanför bounds?
-            float halfX = bounds.ValueRO.Size.x * 0.5f;
-            float halfY = bounds.ValueRO.Size.y * 0.5f;
+            float halfX = size.x * 0.5f;
+            float halfY = size.y * 0.5f;
 
             float minX = center.x - halfX;
             float maxX = center.x + halfX;
@@ -48,8 +61,8 @@ public partial struct AIMoveSystem : ISystem
             pos.x = math.clamp(pos.x, minX, maxX);
             pos.y = math.clamp(pos.y, minY, maxY);
 
-            lt.ValueRW.Position = pos;
+            // Skriv tillbaka
+            lt.Position = pos;
         }
-        Profiler.EndSample();
     }
 }
