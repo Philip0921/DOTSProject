@@ -100,6 +100,8 @@ public partial class PerfSampler : SystemBase
             }
         }
 
+        //if (!ok60) { SaveFile(); Enabled = false; }
+        
     }
     void DoBootstrap()
     {
@@ -136,6 +138,11 @@ public partial class PerfSampler : SystemBase
     }
 
     protected override void OnDestroy()
+    {
+        SaveFile();
+    }
+
+    void SaveFile()
     {
         // Save performance log as JSON array
         if (_csv == null) return; // if we never even inited, don't write

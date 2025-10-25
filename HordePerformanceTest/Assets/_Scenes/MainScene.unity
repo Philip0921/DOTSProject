@@ -403,9 +403,9 @@ MonoBehaviour:
   InitialBatchSize: 100
   BatchStepSize: 100
   StepInterval: 5
-  CurrentBatchSize: 0
-  LastAgentCount: 0
-  LastSavePath: 
+  currentTargetTotal: 0
+  liveAgentCount: 0
+  runTimeSeconds: 0
 --- !u!4 &826671932
 Transform:
   m_ObjectHideFlags: 0
