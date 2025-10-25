@@ -2,56 +2,79 @@ using UnityEngine;
 
 public class AIMove : MonoBehaviour
 {
+    [Header("Movement")]
     [SerializeField] float speed = 0.2f;
-    [SerializeField] float decisionTimeCount = 0f;
-    [SerializeField] Vector2 decisionTime = new Vector2(1, 8);
+
+    [Header("Decision timing (seconds)")]
+    [SerializeField] Vector2 decisionTimeRange = new Vector2(1, 8);
+    [SerializeField] float decisionTimer;
+
+    [Header("Bounds")]
     [SerializeField] Vector2 mapSize = new Vector2(70f, 40f);
 
     private Vector3[] moveDirections = new Vector3[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down, Vector3.zero, Vector3.zero };
-    private int currentMoveDirection;
+    private int currentDirIndex;
 
     private void Start()
     {     
-        decisionTimeCount = Random.Range(decisionTime.x, decisionTime.y);
+        decisionTimer = Random.Range(decisionTimeRange.x, decisionTimeRange.y);
 
         PickMoveDirection();
     }
-
-    private void Update()
+    public void Init(Vector2 boundsSize, float customSpeed, Vector2 decisionRange)
     {
-        if (ReturnToCenter())
+        mapSize = boundsSize;
+        speed = customSpeed;
+        decisionTimeRange = decisionRange;
+
+        decisionTimer = Random.Range(decisionTimeRange.x, decisionTimeRange.y);
+        PickMoveDirection();
+    }
+
+
+    // Sampler calls this once per frame for "AI thinking"
+    public void TickDecision(float dt)
+    {
+        decisionTimer -= dt;
+        if (decisionTimer <= 0f)
         {
-            transform.position = new Vector3(Random.Range(-mapSize.x / 2, mapSize.x / 2), Random.Range(-mapSize.y / 2, mapSize.y / 2), 0);
-        }
-
-        transform.position += moveDirections[currentMoveDirection] * Time.deltaTime * speed;
-
-        if (decisionTimeCount > 0) decisionTimeCount -= Time.deltaTime;
-        else
-        {
-            // Choose a random time delay for taking a decision ( changing direction, or standing in place for a while )
-            decisionTimeCount = Random.Range(decisionTime.x, decisionTime.y);
-
-            // Choose a movement direction, or stay in place
+            decisionTimer = Random.Range(decisionTimeRange.x, decisionTimeRange.y);
             PickMoveDirection();
         }
-
     }
 
-    private bool ReturnToCenter()
+    // Sampler calls this once per frame for "movement / bounds"
+    public void TickMove(float dt)
     {
-        if (transform.position.x >= mapSize.x / 2 || transform.position.x <= -mapSize.x / 2
-            || transform.position.y >= mapSize.y/2 || transform.position.y <= -mapSize.y/2)
+        // Wrap if we leave bounds (teleport inside)
+        if (OutsideBounds())
         {
-            return true;
+            transform.position = new Vector3(
+                Random.Range(-mapSize.x * 0.5f, mapSize.x * 0.5f),
+                Random.Range(-mapSize.y * 0.5f, mapSize.y * 0.5f),
+                0f
+            );
         }
-        else return false;
+
+        transform.position += moveDirections[currentDirIndex] * (speed * dt);
     }
+
+    bool OutsideBounds()
+    {
+        Vector3 p = transform.position;
+        float halfX = mapSize.x * 0.5f;
+        float halfY = mapSize.y * 0.5f;
+
+        return
+            p.x >= halfX || p.x <= -halfX ||
+            p.y >= halfY || p.y <= -halfY;
+    }
+
 
     void PickMoveDirection()
     {
         // Choose whether to move sideways or up/down
-        currentMoveDirection = Mathf.FloorToInt(Random.Range(0, moveDirections.Length));
+        currentDirIndex = Mathf.FloorToInt(Random.Range(0, moveDirections.Length));
     }
 
 }

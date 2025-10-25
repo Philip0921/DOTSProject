@@ -114,7 +114,7 @@ public partial class PerfSampler : SystemBase
             if (spawners.Length > 0)
                 _spawnerTemplate = spawners[0];
             else
-                Debug.LogWarning("PerfSamplerSystem: no spawner template found. Do you have AISpawnAuthoring in scene?\"");
+                Debug.LogWarning("PerfSampler: no spawner template found. Do you have AISpawnAuthoring in scene?\"");
         }
 
         _csv = new StringBuilder(4096);

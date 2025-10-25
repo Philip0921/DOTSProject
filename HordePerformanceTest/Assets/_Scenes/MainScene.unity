@@ -203,6 +203,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &230240977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 230240978}
+  m_Layer: 0
+  m_Name: ---------------OOP-----------------
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &230240978
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 230240977}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &429518759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 429518760}
+  m_Layer: 0
+  m_Name: --------------DOTS-----------------
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &429518760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 429518759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &437634908
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,7 +412,7 @@ GameObject:
   m_Component:
   - component: {fileID: 524086488}
   m_Layer: 0
-  m_Name: AIHolder
+  m_Name: AIContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -387,7 +449,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &826671931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,7 +499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &876470216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,6 +546,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1930022766}
   - component: {fileID: 1930022765}
+  - component: {fileID: 1930022767}
   m_Layer: 0
   m_Name: Version1Test
   m_TagString: Untagged
@@ -505,9 +568,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AISpawner
   aiPrefab: {fileID: 7741157758739483804, guid: 974b5b03933d2b1429a7708962235e60, type: 3}
   aiTransformParent: {fileID: 524086488}
-  spawnCount: 1000
   center: {x: 0, y: 0}
   size: {x: 70, y: 40}
+  agentSpeed: 0.2
+  agentDecisionRange: {x: 1, y: 8}
 --- !u!4 &1930022766
 Transform:
   m_ObjectHideFlags: 0
@@ -523,13 +587,40 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1930022767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930022764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02e8ce4a94ea92b4aa251f099bf9a20e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AISampler
+  spawner: {fileID: 1930022765}
+  aiRoot: {fileID: 524086488}
+  initialBatchSize: 100
+  batchStepSize: 100
+  stepInterval: 2
+  currentTargetTotal: 0
+  liveAgentCount: 0
+  runTimeSeconds: 0
+  lastFrameMS: 0
+  lastDecisionMS: 0
+  lastMoveMS: 0
+  lastSpawnMS: 0
+  ok60: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 437634911}
   - {fileID: 203463250}
+  - {fileID: 230240978}
   - {fileID: 1930022766}
-  - {fileID: 826671932}
   - {fileID: 524086488}
+  - {fileID: 429518760}
+  - {fileID: 826671932}
   - {fileID: 876470217}
